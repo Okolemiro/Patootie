@@ -1,9 +1,367 @@
-#noBtn {
-  position: absolute;
-  background: var(--no);
-  color: var(--no-text);
-  border: 2px solid #f6a4c2;
-  box-shadow: 0 8px 16px rgba(150, 53, 87, 0.2);
-  transition: transform 140ms ease;
-  will-change: transform;
-}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Be My Valentine 💘</title>
+  <style>
+    :root {
+      --bg1: #fff1f6;
+      --bg2: #ffe4ec;
+      --card: rgba(255, 255, 255, 0.86);
+      --text: #7a1e44;
+      --yes: #ff4f8b;
+      --yes-hover: #ff2f75;
+      --no: #fff;
+      --no-text: #9b2f57;
+      --edge-margin: 12;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(circle at 15% 20%, var(--bg2), transparent 45%),
+        radial-gradient(circle at 85% 10%, #ffd2e3, transparent 35%),
+        linear-gradient(140deg, var(--bg1), #fff7fa);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      padding: clamp(16px, 4vw, 28px);
+      position: relative;
+      isolation: isolate;
+    }
+
+    .bg-hearts {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .bg-hearts span {
+      position: absolute;
+      opacity: 0.2;
+      animation: floatHeart linear infinite;
+      user-select: none;
+    }
+
+    @keyframes floatHeart {
+      from {
+        transform: translateY(110vh) scale(0.6) rotate(0deg);
+      }
+      to {
+        transform: translateY(-15vh) scale(1.1) rotate(20deg);
+      }
+    }
+
+    .card {
+      width: min(92vw, 560px);
+      border-radius: 24px;
+      padding: clamp(24px, 5vw, 44px);
+      text-align: center;
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 16px 40px rgba(189, 60, 109, 0.18);
+      backdrop-filter: blur(4px);
+      position: relative;
+      z-index: 2;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      line-height: 1.2;
+      color: #8c1d4d;
+    }
+
+    p {
+      margin: 14px 0 0;
+      font-size: clamp(1rem, 2.6vw, 1.1rem);
+      color: #9f3b63;
+    }
+
+    .actions {
+      margin-top: 28px;
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      align-items: center;
+      min-height: 64px;
+      position: relative;
+    }
+
+    button {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      padding: 14px 26px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+      min-width: 110px;
+    }
+
+    #yesBtn {
+      background: var(--yes);
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(255, 79, 139, 0.42);
+    }
+
+    #yesBtn:hover,
+    #yesBtn:focus-visible {
+      background: var(--yes-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 20px rgba(255, 47, 117, 0.38);
+      outline: none;
+    }
+
+    #noBtn {
+      position: relative;
+      background: var(--no);
+      color: var(--no-text);
+      border: 2px solid #f6a4c2;
+      box-shadow: 0 8px 16px rgba(150, 53, 87, 0.2);
+      transition: transform 140ms ease;
+      will-change: transform;
+    }
+
+    #noBtn:hover {
+      transform: scale(1.05);
+    }
+
+    .message {
+      margin-top: 22px;
+      min-height: 68px;
+      font-size: clamp(1rem, 2.8vw, 1.12rem);
+      line-height: 1.45;
+      color: #7f2a4b;
+    }
+
+    .message strong {
+      display: block;
+      font-size: clamp(1.3rem, 4vw, 1.7rem);
+      margin-bottom: 8px;
+      color: #d11d68;
+    }
+
+    .burst-heart {
+      position: fixed;
+      pointer-events: none;
+      z-index: 6;
+      animation: burst 820ms ease-out forwards;
+      opacity: 0;
+      user-select: none;
+    }
+
+    @keyframes burst {
+      0% {
+        transform: translate(0, 0) scale(0.8);
+        opacity: 0;
+      }
+      15% {
+        opacity: 1;
+      }
+      100% {
+        transform: translate(var(--dx), var(--dy)) scale(1.4);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-hearts" aria-hidden="true" id="bgHearts"></div>
+
+  <main class="card" aria-live="polite">
+    <h1>Do you want to be my valentine?</h1>
+
+    <div class="actions">
+      <button id="yesBtn" type="button">Yes</button>
+      <button id="noBtn" type="button" aria-label="No">No</button>
+    </div>
+
+    <div id="message" class="message"></div>
+  </main>
+
+  <script>
+    (function () {
+      const EDGE_MARGIN = 12;
+      const noBtn = document.getElementById('noBtn');
+      const yesBtn = document.getElementById('yesBtn');
+      const message = document.getElementById('message');
+      const bgHearts = document.getElementById('bgHearts');
+
+      let noPos = { x: 0, y: 0 };
+      let isJumping = false;
+      let initialized = false;
+
+      function clamp(value, min, max) {
+        return Math.min(Math.max(value, min), max);
+      }
+
+      function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      function getSafeRandomPosition() {
+        const rect = noBtn.getBoundingClientRect();
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        const maxX = Math.max(EDGE_MARGIN, vw - rect.width - EDGE_MARGIN);
+        const maxY = Math.max(EDGE_MARGIN, vh - rect.height - EDGE_MARGIN);
+
+        const x = randomInt(EDGE_MARGIN, Math.floor(maxX));
+        const y = randomInt(EDGE_MARGIN, Math.floor(maxY));
+
+        return { x, y };
+      }
+
+      function placeNoButton(x, y) {
+        const rect = noBtn.getBoundingClientRect();
+        const maxX = Math.max(EDGE_MARGIN, window.innerWidth - rect.width - EDGE_MARGIN);
+        const maxY = Math.max(EDGE_MARGIN, window.innerHeight - rect.height - EDGE_MARGIN);
+
+        noPos.x = clamp(x, EDGE_MARGIN, maxX);
+        noPos.y = clamp(y, EDGE_MARGIN, maxY);
+
+        noBtn.style.left = `${noPos.x}px`;
+        noBtn.style.top = `${noPos.y}px`;
+      }
+
+      function placeNoNearActions() {
+        const yesRect = yesBtn.getBoundingClientRect();
+        const rect = noBtn.getBoundingClientRect();
+        const startX = yesRect.right + 14;
+        const startY = yesRect.top + (yesRect.height - rect.height) / 2;
+        placeNoButton(startX, startY);
+      }
+
+      function jumpNoButton() {
+        if (isJumping) return;
+        isJumping = true;
+
+        const next = getSafeRandomPosition();
+        noBtn.style.transform = 'scale(0.95)';
+        placeNoButton(next.x, next.y);
+
+        requestAnimationFrame(() => {
+          noBtn.style.transform = 'scale(1)';
+          isJumping = false;
+        });
+      }
+
+      function isPointerNearNoButton(clientX, clientY, range = 90) {
+        const rect = noBtn.getBoundingClientRect();
+        const nearestX = clamp(clientX, rect.left, rect.right);
+        const nearestY = clamp(clientY, rect.top, rect.bottom);
+        const dx = clientX - nearestX;
+        const dy = clientY - nearestY;
+        return dx * dx + dy * dy <= range * range;
+      }
+
+      function setupBackgroundHearts() {
+        const count = 12;
+        for (let i = 0; i < count; i++) {
+          const heart = document.createElement('span');
+          heart.textContent = Math.random() > 0.5 ? '💖' : '💕';
+          heart.style.left = `${Math.random() * 100}%`;
+          heart.style.fontSize = `${randomInt(14, 30)}px`;
+          heart.style.animationDuration = `${randomInt(12, 22)}s`;
+          heart.style.animationDelay = `-${Math.random() * 16}s`;
+          bgHearts.appendChild(heart);
+        }
+      }
+
+      function heartBurst(x, y) {
+        const hearts = ['💖', '💘', '💕', '💗'];
+        const pieces = 18;
+
+        for (let i = 0; i < pieces; i++) {
+          const piece = document.createElement('span');
+          piece.className = 'burst-heart';
+          piece.textContent = hearts[i % hearts.length];
+          piece.style.left = `${x}px`;
+          piece.style.top = `${y}px`;
+          piece.style.fontSize = `${randomInt(14, 24)}px`;
+
+          const angle = (Math.PI * 2 * i) / pieces;
+          const distance = randomInt(45, 135);
+          piece.style.setProperty('--dx', `${Math.cos(angle) * distance}px`);
+          piece.style.setProperty('--dy', `${Math.sin(angle) * distance}px`);
+
+          document.body.appendChild(piece);
+          piece.addEventListener('animationend', () => piece.remove(), { once: true });
+        }
+      }
+
+      function handleYesClick(event) {
+        const x = event.clientX || window.innerWidth / 2;
+        const y = event.clientY || window.innerHeight / 2;
+
+        message.innerHTML = '<strong>Yaaay! 💖</strong>Wir sind jetzt Valentinspatooties! ';
+        heartBurst(x, y);
+
+        noBtn.style.display = 'none';
+        yesBtn.textContent = 'Forever Yes 💞';
+      }
+
+      function init() {
+        if (initialized) return;
+        initialized = true;
+
+        setupBackgroundHearts();
+        placeNoNearActions();
+
+        document.addEventListener('pointermove', (event) => {
+          if (isPointerNearNoButton(event.clientX, event.clientY, 95)) {
+            jumpNoButton();
+          }
+        }, { passive: true });
+
+        noBtn.addEventListener('pointerenter', jumpNoButton);
+        noBtn.addEventListener('pointerdown', (event) => {
+          event.preventDefault();
+          jumpNoButton();
+        });
+
+        noBtn.addEventListener('touchstart', (event) => {
+          event.preventDefault();
+          jumpNoButton();
+        }, { passive: false });
+
+        noBtn.addEventListener('click', (event) => {
+          event.preventDefault();
+          jumpNoButton();
+        });
+
+        yesBtn.addEventListener('click', handleYesClick);
+
+        window.addEventListener('resize', () => {
+          if (noBtn.style.display !== 'none') {
+            placeNoButton(noPos.x, noPos.y);
+          }
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init, { once: true });
+      } else {
+        init();
+      }
+    })();
+  </script>
+</body>
+</html>
