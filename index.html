@@ -129,16 +129,13 @@
     }
 
     #noBtn {
-      position: fixed;
-      top: 0;
-      left: 0;
+      position: relative;
       background: var(--no);
       color: var(--no-text);
       border: 2px solid #f6a4c2;
       box-shadow: 0 8px 16px rgba(150, 53, 87, 0.2);
-      z-index: 4;
       transition: transform 140ms ease;
-      will-change: left, top, transform;
+      will-change: transform;
     }
 
     #noBtn:hover {
